@@ -1,0 +1,59 @@
+---
+title: "ANLY 506-52- B-2019/Summer - Exploratory Data Analytics"
+subtitle: "Code Portfolio - Week-11 - PCA Analysis"
+author: "Latika Yadav"
+date: "7/25/2019"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Eigenvalues and Eigenvectors
+
+* Eigenvectors and eigenvalues has pairs: each eigenvector has a corresponding eigenvalue. 
+* Useful explaination:
+    + eigenvector = direction
+    + eigenvalue = variance in the data in that direction
+    + vector with highest value = 1st principal component
+
+## Compute the Principal Components
+prcop() performs principal components analysis on the given data matrix and returns the results as an object of class prcomp. Proportion of Variance explains a percentage of the total variation in the dataset. Here PC1 explains ~63% of variance in the dataset.
+```{r}
+mtcars.pca <- prcomp(mtcars[,c(1:7,10,11)], center = TRUE,scale. = TRUE)
+summary(mtcars.pca)
+```
+
+## Plotting PCA
+
+```{r, warning=FALSE}
+#library(devtools)
+#install_github("vqv/ggbiplot")
+library(ggbiplot)
+ggbiplot(mtcars.pca)
+```
+
+Creating groups and making ellipses around each groups to better understand the PCs
+```{r, warning=FALSE}
+mtcars.country <- c(rep("Japan", 3), rep("US",4), rep("Europe", 7),rep("US",3), "Europe", rep("Japan", 3), rep("US",4), rep("Europe", 3), "US", rep("Europe", 3))
+
+ggbiplot(mtcars.pca,ellipse=TRUE, labels=rownames(mtcars), groups=mtcars.country)
+
+#to create a circle around the dataset
+#to scale the samples add - obs.scale = 1, var.scale = 1
+# to remove axis add - var.axes=FALSE
+ggbiplot(mtcars.pca,ellipse=TRUE,circle=TRUE, labels=rownames(mtcars), groups=mtcars.country)
+```
+
+## Customize PCA plots
+
+```{r, warning=FALSE}
+ggbiplot(mtcars.pca,ellipse=TRUE,obs.scale = 1, var.scale = 1,  labels=rownames(mtcars), groups=mtcars.country) +
+  scale_colour_manual(name="Origin", values= c("pink", "red3", "dark blue"))+
+  ggtitle("PCA of mtcars dataset")+ #adding a title
+  theme_minimal()+ #using minimal theme
+  theme(legend.position = "bottom") #legend placement at the bottom
+```

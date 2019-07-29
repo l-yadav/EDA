@@ -1,0 +1,78 @@
+---
+title: "ANLY 506-52- B-2019/Summer - Exploratory Data Analytics"
+subtitle: "Code Portfolio - Week-5 - Tidy Data practice"
+author: "Latika Yadav"
+date: "7/28/2019"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Loading libraries
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(readr)
+library(knitr)
+library(Hmisc)
+library(missForest)
+```
+
+## Using Religion income dataset provided in moodle
+```{r message=FALSE, warning=FALSE}
+setwd("~/Documents/Harrisburg/EDA 506 52 B/R/Workshop-R-Workflow/Data/week 5")
+religion = read_csv("religion_income.csv")
+```
+
+## Gather data from wide to long table
+```{r}
+kable(religion)
+```
+
+```{r}
+long <- religion %>% 
+  gather(income, freq, 2:11)
+kable(long[1:10,])
+```
+
+
+#Separating 
+```{r}
+separated_data <- long %>% 
+  separate(income, into = c("min_income", "max_income"), sep = "--")
+kable(separated_data[1:10,])
+#this is introducing NAs into the data, which may not be the correct approach
+```
+
+#Uniting 
+```{r}
+united_data <- separated_data %>% 
+  unite(income, min_income, max_income, sep="-")
+kable(united_data[1:10,])
+#due to NAs unite doesn't exactly put the data back together
+```
+
+## Missing values
+
+Introducing missing values ( 10% )
+```{r}
+sum(is.na(long)) 
+#no missing values in our long dataset
+#introducing missing values
+long.mis <- prodNA(long, noNA = 0.1)
+kable(summary(long.mis))
+```
+```{r}
+#number of missing values introduced
+print(paste0("Missing Values:", sum(is.na(long.mis)==TRUE)))
+```
+
+Imputing freq with mean value
+```{r}
+long.mis$imputed_freq <- with(long.mis, impute(freq, mean))
+```
+
+
